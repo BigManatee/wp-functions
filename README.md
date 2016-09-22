@@ -28,6 +28,10 @@
 * [Escape HTML in Posts](#escape-html-in-posts)
 * [Create Custom Global Settings](#create-custom-global-settings)
 * [Remove WordPress Admin Bar](#remove-wordpress-admin-bar)
+* [Show all admin options](#show-all-admin-options)
+* [Set maximum number of post revisions](#set-maximum-number-of-post-revisions)
+* [DB Queries, Time, Memory](#db-queries-time-memory)
+* [Output theme template](#output-theme-template)
 
 ### Hide WordPress Update Nag to All But Admins
 
@@ -431,4 +435,45 @@ function remove_admin_bar() {
 	remove_action('wp_head', '_admin_bar_bump_cb');
 }
 add_action('get_header', 'remove_admin_bar');
+```
+
+### Show all admin options
+
+```php
+function all_settings_link() {
+	add_options_page(__('All Settings'), __('All Settings'), 'administrator', 'options.php');
+}
+add_action('admin_menu', 'all_settings_link');
+```
+
+### Set maximum number of post revisions
+
+```php
+if (!defined('WP_POST_REVISIONS')) define('WP_POST_REVISIONS', 5);
+```
+
+### DB Queries, Time, Memory
+
+```php
+function performance( $visible = false ) {
+
+    $stat = sprintf(  '%d queries in %.3f seconds, using %.2fMB memory',
+        get_num_queries(),
+        timer_stop( 0, 3 ),
+        memory_get_peak_usage() / 1024 / 1024
+        );
+
+    echo $visible ? $stat : "<!-- {$stat} -->" ;
+}
+add_action('wp_footer', 'performance', 20);
+```
+
+### Output theme template
+
+```php
+function show_template() {
+    global $template;
+    print_r($template);
+}
+add_action('wp_head', 'show_template');
 ```
