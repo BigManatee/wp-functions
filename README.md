@@ -473,7 +473,9 @@ add_action('wp_footer', 'performance', 20);
 ```php
 function show_template() {
     global $template;
-    print_r($template);
+    echo '<div style="border:2px red dotted;padding:10px;z-index:9999999;position:absolute;background:rgba(255, 255, 255, 0.32)">';
+    	print_r($template);
+    echo '</div>';
 }
 add_action('wp_head', 'show_template');
 ```
