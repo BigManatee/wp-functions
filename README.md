@@ -32,6 +32,11 @@
 * [Set maximum number of post revisions](#set-maximum-number-of-post-revisions)
 * [DB Queries, Time, Memory](#db-queries-time-memory)
 * [Output theme template](#output-theme-template)
+* [Add Open Graph Meta Tags](#add-open-graph-meta-tags)
+* [Add Custom Post Type](#add-custom-post-type)
+* [Implement Preconnect to Google Fonts in Themes](#implement-preconnect-to-google-fonts-in-themes)
+* [Add Thumbnail Column to Post Listing](#add-thumbnail-column-to-post-listing)
+* [Add Lead Class to First Paragraph](#add-lead-class-to-first-paragraph)
 
 ### Hide WordPress Update Nag to All But Admins
 
@@ -479,3 +484,143 @@ function show_template() {
 }
 add_action('wp_head', 'show_template');
 ```
+
+## Add Open Graph Meta Tags
+
+```php
+// Add Open Graph Meta Tags
+function meta_og() {
+	global $post;
+	if ( is_single() ) {
+		if(has_post_thumbnail($post->ID)) {
+			$img_src = wp_get_attachment_image_src(get_post_thumbnail_id( $post->ID ), 'thumbnail');
+		} 
+		$excerpt = strip_tags($post->post_content);
+		$excerpt_more = '';
+		if (strlen($excerpt) > 155) {
+			$excerpt = substr($excerpt,0,155);
+			$excerpt_more = ' ...';
+		}
+		$excerpt = str_replace('"', '', $excerpt);
+		$excerpt = str_replace("'", '', $excerpt);
+		$excerptwords = preg_split('/[\n\r\t ]+/', $excerpt, -1, PREG_SPLIT_NO_EMPTY);
+		array_pop($excerptwords);
+		$excerpt = implode(' ', $excerptwords) . $excerpt_more;
+		?>
+<meta name="author" content="Your Name">
+<meta name="description" content="<?php echo $excerpt; ?>">
+<meta property="og:title" content="<?php echo the_title(); ?>">
+<meta property="og:description" content="<?php echo $excerpt; ?>">
+<meta property="og:type" content="article">
+<meta property="og:url" content="<?php echo the_permalink(); ?>">
+<meta property="og:site_name" content="Your Site Name">
+<meta property="og:image" content="<?php echo $img_src[0]; ?>">
+<?php
+	} else {
+			return;
+	}
+}
+add_action('wp_head', 'meta_og', 5);
+```
+
+## Add Custom Post Type
+
+```php
+// Create Custom Post Type
+function create_custom_post() {
+	register_post_type('custom-post', // slug for custom post type
+		array(
+		'labels' => array(
+			'name' => __('Custom Post'),
+		),
+		'public' => true,
+		'hierarchical' => true, 
+		'has_archive' => true,
+		'supports' => array(
+			'title',
+			'editor',
+			'excerpt',
+			'thumbnail'
+		), 
+		'can_export' => true,
+		'taxonomies' => array(
+				'post_tag',
+				'category'
+		)
+	));
+}
+add_action('init', 'create_custom_post');
+```
+
+## Implement Preconnect to Google Fonts in Themes
+
+```php
+function twentyfifteen_resource_hints( $urls, $relation_type ) {
+	// Checks whether the subject is carrying the source of fonts google and the `$relation_type` equals preconnect.
+	// Replace `enqueue_font_id` the `ID` used in loading the source.
+	if ( wp_style_is( 'enqueue_font_id', 'queue' ) && 'preconnect' === $relation_type ) {
+		// Checks whether the version of WordPress is greater than or equal to 4.7
+		// to ensure conmpatibilidade with older versions
+		// because the 4.7 has become necessary to return an array instead of string
+		if ( version_compare( $GLOBALS['wp_version'], '4.7-alpha', '>=' ) ) {
+			// Array with url google fonts and crossorigin
+			$urls[] = array(
+				'href' => 'https://fonts.gstatic.com',
+				'crossorigin',
+			);
+		} else {
+			// String with url google fonts
+			$urls[] = 'https://fonts.gstatic.com';
+		}
+	}
+	return $urls;
+}
+add_filter( 'wp_resource_hints', 'twentyfifteen_resource_hints', 10, 2 ); 
+```
+
+## Add Thumbnail Column to Post Listing
+
+```php
+add_image_size( 'admin-list-thumb', 80, 80, false );
+
+function wpcs_add_thumbnail_columns( $columns ) {
+     
+    if ( !is_array( $columns ) )
+        $columns = array();
+    $new = array();
+
+    foreach( $columns as $key => $title ) {
+        if ( $key == 'title' ) // Put the Thumbnail column before the Title column
+            $new['featured_thumb'] = __( 'Image');
+        $new[$key] = $title;
+    }
+    return $new;
+}
+
+function wpcs_add_thumbnail_columns_data( $column, $post_id ) {
+    switch ( $column ) {
+    case 'featured_thumb':
+        echo '<a href="' . $post_id . '">';
+        echo the_post_thumbnail( 'admin-list-thumb' );
+        echo '</a>';
+        break;
+    }
+}
+
+if ( function_exists( 'add_theme_support' ) ) {
+    add_filter( 'manage_posts_columns' , 'wpcs_add_thumbnail_columns' );
+    add_action( 'manage_posts_custom_column' , 'wpcs_add_thumbnail_columns_data', 10, 2 );
+}
+```
+## Add Lead Class to First Paragraph
+
+```php
+// Add Lead Class to First Paragraph
+function first_paragraph( $content ) {
+	return preg_replace('/<p([^>]+)?>/', '<p$1 class="lead">', $content, 1);
+}
+add_filter( 'the_content', 'first_paragraph' );
+```
+
+Adds a `lead` class to the first paragraph in [the_content](https://developer.wordpress.org/reference/functions/the_content/).
+
