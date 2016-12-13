@@ -37,7 +37,7 @@
 * [Implement Preconnect to Google Fonts in Themes](#implement-preconnect-to-google-fonts-in-themes)
 * [Add Thumbnail Column to Post Listing](#add-thumbnail-column-to-post-listing)
 * [Add Lead Class to First Paragraph](#add-lead-class-to-first-paragraph)
-* [Duplicate post or page quickly](#duplicate-post-or-page-quicly)
+* [Duplicate post or page quickly](#duplicate-post-or-page-quickly)
 
 ### Hide WordPress Update Nag to All But Admins
 
