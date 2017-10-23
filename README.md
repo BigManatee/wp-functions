@@ -38,6 +38,7 @@
 * [Add Thumbnail Column to Post Listing](#add-thumbnail-column-to-post-listing)
 * [Add Lead Class to First Paragraph](#add-lead-class-to-first-paragraph)
 * [Duplicate post or page quickly](#duplicate-post-or-page-quickly)
+* [Remove Feed Links from Head](#remove-feed-links-from-head)
 
 ### Hide WordPress Update Nag to All But Admins
 
@@ -722,7 +723,8 @@ function duplicate_post_link( $actions, $post ) {
 
 add_action( 'admin_action_duplicate_post_as_draft', 'duplicate_post_as_draft' );
 add_filter('post_row_actions', 'duplicate_post_link', 10, 2); // add the feature to the dashboard post rows
-add_filter('page_row_actions', 'duplicate_post_link', 10, 2); // add the feature to the dashboard page rows```
+add_filter('page_row_actions', 'duplicate_post_link', 10, 2); // add the feature to the dashboard page rows
+```
 
 ## Remove Feed Links from Head
 
