@@ -722,4 +722,10 @@ function duplicate_post_link( $actions, $post ) {
 
 add_action( 'admin_action_duplicate_post_as_draft', 'duplicate_post_as_draft' );
 add_filter('post_row_actions', 'duplicate_post_link', 10, 2); // add the feature to the dashboard post rows
-add_filter('page_row_actions', 'duplicate_post_link', 10, 2); // add the feature to the dashboard page rows
+add_filter('page_row_actions', 'duplicate_post_link', 10, 2); // add the feature to the dashboard page rows```
+
+## Remove Feed Links from Head
+
+```php
+remove_action('wp_head', 'feed_links', 2);
+```
